@@ -55,7 +55,7 @@ execSync('git add .'); // Ajoute tous les fichiers modifiés à l'index Git
 execSync('git commit -m "Auto commit"'); // Effectue un commit avec le message "Auto commit"
 
 // Pousser vers GitHub sur la branche principale (assumant que le remote est nommé "origin" et la branche est "main" ou "master")
-execSync('git push origin main'); // Pousse les modifications vers la branche principale sur le dépôt distant
+execSync('git push origin master'); // Pousse les modifications vers la branche principale sur le dépôt distant
 
 // Fermer le processus
 process.exit(); // Termine le processus Node.js
