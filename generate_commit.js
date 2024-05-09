@@ -57,7 +57,7 @@ function addCommit(commitMessage) {
 }
 
 // Lors de la sauvegarde, assurez-vous que la fermeture de la liste est bien formatée
-fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML.replace(/\n\s+<\/ul>/, '\n</ul>'));
+//fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML.replace(/\n\s+<\/ul>/, '\n</ul>'));
 
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
