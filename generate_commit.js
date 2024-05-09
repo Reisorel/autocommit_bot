@@ -28,8 +28,14 @@ const { document } = window;
 function generateCommit() {
   // Obtient la date actuelle
   const today = new Date();
+  const options = {
+    year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+  };
+
+
   // Génère un message de commit avec la date actuelle
-  const commitMessage = "Commit quotidien du " + today.toDateString();
+  const commitMessage = "Commit quotidien du " + today.toLocaleDateString('fr-FR');
   // Appelle la fonction addCommit pour ajouter le commit à la liste
   addCommit(commitMessage);
 }
@@ -44,6 +50,8 @@ function addCommit(commitMessage) {
   newCommit.textContent = commitMessage;
   // Ajoute l'élément <li> à la liste des commits
   commitsList.appendChild(newCommit);
+  // Ajoute un retour à la ligne après chaque élément <li> dans le HTML
+  commitsList.appendChild(document.createTextNode('\n'));
 }
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
