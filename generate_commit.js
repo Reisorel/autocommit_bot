@@ -48,10 +48,12 @@ function addCommit(commitMessage) {
   const newCommit = document.createElement('li');
   // Définit le texte du commit comme contenu de l'élément <li>
   newCommit.textContent = commitMessage;
+  // Ajoute une tabulation (ou espaces) avant l'élément <li> pour uniformiser l'indentation
+  commitsList.appendChild(document.createTextNode('\n    '));
   // Ajoute l'élément <li> à la liste des commits
   commitsList.appendChild(newCommit);
   // Ajoute un retour à la ligne après chaque élément <li> dans le HTML
-  commitsList.appendChild(document.createTextNode('\n'+'    '));
+  commitsList.appendChild(document.createTextNode('\n'));
 }
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
