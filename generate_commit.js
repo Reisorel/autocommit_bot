@@ -61,6 +61,10 @@ function addCommit(commitMessage) {
 
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
+const htmlOutput = window.document.documentElement.outerHTML
+  .replace(/<\/body>\s*<\/html>/, '</body>\n</html>'); // Assure que </body> et </html> sont sur des lignes séparées
+
+fs.writeFileSync(htmlFilePath, htmlOutput);
 
 // Enregistrer le fichier HTML modifié
 fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML); // Écrit le contenu modifié du DOM dans le fichier HTML
