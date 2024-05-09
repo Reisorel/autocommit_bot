@@ -40,21 +40,25 @@ function generateCommit() {
   addCommit(commitMessage);
 }
 
-// Fonction pour ajouter un commit à la liste
 function addCommit(commitMessage) {
-  // Sélectionne l'élément <ul> qui contient la liste des commits
   const commitsList = document.querySelector('#commitsList');
+
   // Crée un nouvel élément <li> pour représenter le commit
   const newCommit = document.createElement('li');
-  // Définit le texte du commit comme contenu de l'élément <li>
   newCommit.textContent = commitMessage;
-  // Ajoute une tabulation (ou espaces) avant l'élément <li> pour uniformiser l'indentation
-  commitsList.appendChild(document.createTextNode('\n    '));
-  // Ajoute l'élément <li> à la liste des commits
+
+  // Ajoute l'élément <li> à la liste des commits avec une gestion plus contrôlée des sauts de ligne
+  if (commitsList.lastChild) {
+    commitsList.appendChild(document.createTextNode('\n    '));
+  }
   commitsList.appendChild(newCommit);
-  // Ajoute un retour à la ligne après chaque élément <li> dans le HTML
-  commitsList.appendChild(document.createTextNode('\n'));
+  // Ajoute un retour à la ligne après le dernier élément <li> seulement si nécessaire
+  commitsList.appendChild(document.createTextNode('\n  '));
 }
+
+// Lors de la sauvegarde, assurez-vous que la fermeture de la liste est bien formatée
+fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML.replace(/\n\s+<\/ul>/, '\n</ul>'));
+
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
 
