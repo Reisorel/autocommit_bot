@@ -53,7 +53,6 @@ function addCommit(commitMessage) {
   // Ajoute l'élément <li> à la liste des commits
   commitsList.appendChild(newCommit);
   // Ajoute un retour à la ligne après chaque élément <li> dans le HTML
-  commitsList.appendChild(document.createTextNode('\n'));
 }
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
