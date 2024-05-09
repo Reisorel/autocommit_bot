@@ -1,3 +1,6 @@
+const process = require('process');
+process.chdir('/home/lerosier/Projet_autocommit');
+
 // Importe le module fs (File System) de Node.js pour interagir avec les fichiers
 const fs = require('fs');
 // Importe le module path de Node.js pour gérer les chemins de fichiers
@@ -49,13 +52,16 @@ generateCommit(); // Appelle la fonction pour générer un commit quotidien
 fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML); // Écrit le contenu modifié du DOM dans le fichier HTML
 
 // Ajouter tous les fichiers modifiés à l'index
-execSync('git add .'); // Ajoute tous les fichiers modifiés à l'index Git
+// Ajoute tous les fichiers modifiés à l'index Git
+execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
 
 // Effectuer le commit avec un message prédéfini
-execSync('git commit -m "Auto commit"'); // Effectue un commit avec le message "Auto commit"
+// Effectue un commit avec le message "Auto commit"
+execSync('git commit -m "Auto commit"', { cwd: '/home/lerosier/Projet_autocommit' });
 
 // Pousser vers GitHub sur la branche principale (assumant que le remote est nommé "origin" et la branche est "main" ou "master")
-execSync('git push origin master'); // Pousse les modifications vers la branche principale sur le dépôt distant
+// Pousse les modifications vers la branche principale sur le dépôt distant
+execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
 
 // Fermer le processus
 process.exit(); // Termine le processus Node.js
