@@ -52,7 +52,6 @@ function addCommit(commitMessage) {
   commitsList.appendChild(document.createTextNode('  ')); // Deux espaces pour l'indentation
   commitsList.appendChild(newCommit);
   // Ajoute un seul saut de ligne après l'élément <li> pour le formater dans le fichier HTML
-  commitsList.appendChild(document.createTextNode('\n'));
 }
 
 generateCommit(); // Appelle la fonction pour générer un commit quotidien
