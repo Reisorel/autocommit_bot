@@ -49,7 +49,7 @@ function addCommit(commitMessage) {
   // Définit le texte du commit comme contenu de l'élément <li>
   newCommit.textContent = commitMessage;
   // Ajoute une tabulation (ou espaces) avant l'élément <li> pour uniformiser l'indentation
-  commitsList.appendChild(document.createTextNode('\n    '));
+  // commitsList.appendChild(document.createTextNode('\n    '));
   // Ajoute l'élément <li> à la liste des commits
   commitsList.appendChild(newCommit);
   // Ajoute un retour à la ligne après chaque élément <li> dans le HTML
