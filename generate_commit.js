@@ -35,7 +35,7 @@ function generateCommit() {
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     };
     // Génère un message de commit avec la date actuelle
-    const commitMessage = "Commit quotidien du " + today.toLocaleString('fr-FR', options);
+    const commitMessage = "Commit quotidien du " + today.toLocaleString('fr-FR', options) + " avec " + commitCount + " commits.";
     // Appelle la fonction addCommit pour ajouter le commit à la liste
     addCommit(commitMessage);
   }
