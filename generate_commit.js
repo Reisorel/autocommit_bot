@@ -1,10 +1,10 @@
 // Importe les modules nécessaires
-const process = require('process');
 const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 const { execSync } = require('child_process');
 
+// Change le répertoire de travail
 try {
   process.chdir('/home/lerosier/Projet_autocommit');
   console.log('Répertoire de travail changé avec succès.');
@@ -13,8 +13,10 @@ try {
   process.exit(1);
 }
 
+// Chemin du fichier HTML
 const htmlFilePath = path.join(__dirname, 'index.html');
 
+// Lit le contenu du fichier HTML
 let htmlContent;
 try {
   htmlContent = fs.readFileSync(htmlFilePath, 'utf-8');
@@ -24,6 +26,7 @@ try {
   process.exit(1);
 }
 
+// Crée une instance JSDOM
 let window, document;
 try {
   ({ window } = new JSDOM(htmlContent));
@@ -34,7 +37,16 @@ try {
   process.exit(1);
 }
 
-// Fonction pour générer un nombre entier aléatoire entre min et max (inclus)
+// Fonction pour obtenir une date au format spécifié
+function formatDate(date) {
+  const options = {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+  };
+  return date.toLocaleString('fr-FR', options).replace(/"/g, '\\"');
+}
+
+// Fonction pour générer un nombre aléatoire entre min et max
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -56,75 +68,77 @@ function addCommit(commitMessage) {
   }
 }
 
-// Fonction pour nettoyer les horodatages superflus dans le HTML
+// Fonction pour effectuer les commits Git
+function performGitCommits(commitMessage) {
+  try {
+    console.log('Ajout des fichiers pour le commit...');
+    execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+
+    console.log('Vérification de l\'état du dépôt avant commit...');
+    execSync('git status', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+
+    console.log(`Création du commit avec le message: "${commitMessage}"`);
+    execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+
+    console.log('Poussée des modifications...');
+    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+    console.log('Modifications poussées avec succès.');
+  } catch (error) {
+    console.error(`Erreur lors de la réalisation du commit: ${error.message}`);
+    console.error(`Stack: ${error.stack}`);
+    process.exit(1);
+  }
+}
+
+// Fonction pour nettoyer le HTML en gardant un seul <li> par jour
 function cleanCommitInfo() {
   try {
     const commitsList = document.querySelector('#commitsList');
     if (!commitsList) {
       throw new Error('Element #commitsList non trouvé dans le DOM');
     }
+
     const commits = Array.from(commitsList.querySelectorAll('li'));
-    if (commits.length > 1) {
-      // Conserver uniquement le dernier élément
-      const lastCommit = commits.pop();
-      commitsList.innerHTML = ''; // Vide la liste
-      commitsList.appendChild(lastCommit); // Ajoute uniquement le dernier commit
-    }
+    const commitsByDate = {};
+
+    // Regroupe les commits par date
+    commits.forEach(commit => {
+      const textContent = commit.textContent;
+      const dateMatch = textContent.match(/^Commit quotidien du (.+?) à/);
+      if (dateMatch) {
+        const dateKey = dateMatch[1];
+        if (!commitsByDate[dateKey]) {
+          commitsByDate[dateKey] = { count: 0, lastCommit: textContent };
+        }
+        commitsByDate[dateKey].count++;
+        commitsByDate[dateKey].lastCommit = textContent; // Conserve le dernier commit du jour
+      }
+    });
+
+    // Construit la liste finale des commits
+    commitsList.innerHTML = '';
+    Object.values(commitsByDate).forEach(({ count, lastCommit }) => {
+      const finalCommit = lastCommit.replace(/avec \d+ commits\./, `avec ${count} commits.`);
+      const li = document.createElement('li');
+      li.textContent = finalCommit;
+      commitsList.appendChild(li);
+    });
+
+    console.log('HTML nettoyé pour ne conserver qu\'un seul <li> par jour avec le nombre total de commits.');
   } catch (error) {
     console.error(`Erreur lors du nettoyage du HTML: ${error.message}`);
     process.exit(1);
   }
 }
 
-// Fonction pour effectuer les commits Git
-function performGitCommits(commitCount) {
-  try {
-    for (let i = 0; i < commitCount; i++) {
-      const today = new Date();
-      const options = {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-      };
-      const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options).replace(/"/g, '\\"')}`;
-
-      console.log(`Ajout des fichiers pour commit ${i + 1}...`);
-      execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
-
-      console.log('Vérification de l\'état du dépôt avant commit...');
-      execSync('git status', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
-
-      console.log(`Création du commit ${i + 1} avec le message: "${commitMessage}"`);
-      try {
-        execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
-      } catch (commitError) {
-        console.error(`Erreur lors du commit ${i + 1}: ${commitError.message}`);
-        console.error(`Stack: ${commitError.stack}`);
-        throw commitError; // Rethrow to ensure the outer catch handles it
-      }
-    }
-
-    console.log('Poussée des modifications...');
-    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
-    console.log('Modifications poussées avec succès.');
-  } catch (error) {
-    console.error(`Erreur lors de la réalisation des commits Git: ${error.message}`);
-    console.error(`Stack: ${error.stack}`);
-    process.exit(1);
-  }
-}
-
-// Détermine le nombre de commits à faire
+// Détermine le nombre de commits à faire pour chaque ajout (entre 1 et 8)
 const commitCount = getRandomInt(1, 8);
-console.log(`Nombre de commits à réaliser: ${commitCount}`);
+console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
 // Ajoute et commite chaque horodatage
 for (let i = 0; i < commitCount; i++) {
   const today = new Date();
-  const options = {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-  };
-  const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
+  const commitMessage = `Commit quotidien du ${formatDate(today)}`;
 
   addCommit(commitMessage);
 
@@ -133,7 +147,7 @@ for (let i = 0; i < commitCount; i++) {
     console.log('Fichier HTML enregistré avec succès.');
 
     // Effectue le commit
-    performGitCommits(1); // Effectue un commit à la fois
+    performGitCommits(commitMessage);
   } catch (error) {
     console.error(`Erreur lors de l'enregistrement du fichier HTML ou du commit: ${error.message}`);
     process.exit(1);
