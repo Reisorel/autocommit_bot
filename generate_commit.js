@@ -89,12 +89,12 @@ function performGitCommits(commitCount) {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
         hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
       };
-      const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
+      const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options).replace(/"/g, '\\"')}`;
 
       console.log(`Ajout des fichiers pour commit ${i + 1}...`);
       execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
 
-      console.log(`Création du commit ${i + 1}...`);
+      console.log(`Création du commit ${i + 1} avec le message: "${commitMessage}"`);
       execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
     }
 
