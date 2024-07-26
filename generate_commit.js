@@ -20,25 +20,10 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Fonction pour vérifier s'il y a des modifications à valider
-function hasChanges() {
-  try {
-    const status = execSync('git status --porcelain', { cwd: '/home/lerosier/Projet_autocommit', encoding: 'utf-8' });
-    return status.length > 0;
-  } catch (err) {
-    console.error('Erreur lors de la vérification des changements :', err.message);
-    throw err;
-  }
-}
-
 // Fonction pour générer des commits quotidiens avec la date du jour
 function generateCommits() {
   const commitCount = getRandomInt(1, 8); // Génère un nombre aléatoire de commits entre 1 et 8
   for (let i = 0; i < commitCount; i++) {
-    if (!hasChanges()) {
-      console.log('Aucun changement à valider.');
-      continue; // Passe à l'itération suivante si aucune modification
-    }
     const today = new Date();
     const options = {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
