@@ -132,7 +132,7 @@ function cleanCommitInfo() {
 }
 
 // Détermine le nombre de commits à faire pour chaque ajout (entre 1 et 8)
-const commitCount = getRandomInt(1, 8);
+const commitCount = getRandomInt(1, 2);
 console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
 // Ajoute et commite chaque horodatage
