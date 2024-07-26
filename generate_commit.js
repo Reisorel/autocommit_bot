@@ -1,24 +1,42 @@
 // Importe le module process pour changer le répertoire de travail
 const process = require('process');
-process.chdir('/home/lerosier/Projet_autocommit');
-
-// Importe le module fs (File System) pour interagir avec les fichiers
 const fs = require('fs');
-// Importe le module path pour gérer les chemins de fichiers
 const path = require('path');
-// Importe la classe JSDOM du module jsdom pour manipuler le DOM HTML côté serveur
 const { JSDOM } = require('jsdom');
-// Importe la fonction execSync du module child_process pour exécuter des commandes système synchrones
 const { execSync } = require('child_process');
+
+try {
+  // Changer le répertoire de travail
+  process.chdir('/home/lerosier/Projet_autocommit');
+  console.log('Répertoire de travail changé avec succès.');
+} catch (error) {
+  console.error(`Erreur lors du changement de répertoire de travail: ${error.message}`);
+  process.exit(1);
+}
 
 // Construit le chemin absolu vers le fichier HTML
 const htmlFilePath = path.join(__dirname, 'index.html');
-// Lit le contenu du fichier HTML en utilisant utf-8 comme encodage
-const htmlContent = fs.readFileSync(htmlFilePath, 'utf-8');
-// Crée une instance JSDOM avec le contenu HTML pour manipuler le DOM côté serveur
-const { window } = new JSDOM(htmlContent);
-// Récupère l'objet document du DOM à partir de la fenêtre JSDOM
-const { document } = window;
+
+let htmlContent;
+try {
+  // Lit le contenu du fichier HTML
+  htmlContent = fs.readFileSync(htmlFilePath, 'utf-8');
+  console.log('Contenu du fichier HTML lu avec succès.');
+} catch (error) {
+  console.error(`Erreur lors de la lecture du fichier HTML: ${error.message}`);
+  process.exit(1);
+}
+
+let window, document;
+try {
+  // Crée une instance JSDOM avec le contenu HTML
+  ({ window } = new JSDOM(htmlContent));
+  document = window.document;
+  console.log('Instance JSDOM créée avec succès.');
+} catch (error) {
+  console.error(`Erreur lors de la création de JSDOM: ${error.message}`);
+  process.exit(1);
+}
 
 // Fonction pour générer un nombre entier aléatoire entre min et max (inclus)
 function getRandomInt(min, max) {
@@ -27,65 +45,88 @@ function getRandomInt(min, max) {
 
 // Fonction pour ajouter le commit au DOM
 function addCommit(commitMessage) {
-  // Sélectionner l'ID commitList
-  const commitsList = document.querySelector('#commitsList');
-  // Crée un nouvel élément <li> pour représenter le commit
-  const newCommit = document.createElement('li');
-  newCommit.textContent = commitMessage;
-  // Ajoute l'élément <li> à la liste des commits avec une gestion plus contrôlée des sauts de ligne
-  if (commitsList.lastChild) {
-    commitsList.appendChild(document.createTextNode('\n    '));
+  try {
+    const commitsList = document.querySelector('#commitsList');
+    if (!commitsList) {
+      throw new Error('Element #commitsList non trouvé dans le DOM');
+    }
+    const newCommit = document.createElement('li');
+    newCommit.textContent = commitMessage;
+    if (commitsList.lastChild) {
+      commitsList.appendChild(document.createTextNode('\n    '));
+    }
+    commitsList.appendChild(newCommit);
+    commitsList.appendChild(document.createTextNode('\n  '));
+    console.log(`Commit ajouté au DOM: ${commitMessage}`);
+  } catch (error) {
+    console.error(`Erreur lors de l'ajout du commit au DOM: ${error.message}`);
+    process.exit(1);
   }
-  commitsList.appendChild(newCommit);
-  // Ajoute un retour à la ligne après le dernier élément <li> seulement si nécessaire
-  commitsList.appendChild(document.createTextNode('\n  '));
 }
 
 // Fonction pour ajouter une ligne d'horodatage et le nombre de commits dans le fichier HTML
 function addCommitInfoToHtml(commitCount) {
-  // Obtient la date actuelle
-  const today = new Date();
-  const options = {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-  };
-  // Génère le message d'horodatage
-  const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)} avec ${commitCount} commits.`;
-
-  // Ajoute le commit au DOM en utilisant la fonction addCommit
-  addCommit(commitMessage);
-}
-
-// Fonction pour effectuer les commits Git
-function performGitCommits(commitCount) {
-  for (let i = 0; i < commitCount; i++) {
-    // Obtient la date actuelle
+  try {
     const today = new Date();
     const options = {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     };
-    // Crée le message de commit
-    const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
-    // Effectue le commit avec le message généré
-    execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
-    execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
+    const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)} avec ${commitCount} commits.`;
+    addCommit(commitMessage);
+  } catch (error) {
+    console.error(`Erreur lors de l'ajout des informations de commit au HTML: ${error.message}`);
+    process.exit(1);
   }
-  // Pousse les modifications vers le dépôt distant
-  execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
+}
+
+// Fonction pour effectuer les commits Git
+function performGitCommits(commitCount) {
+  try {
+    for (let i = 0; i < commitCount; i++) {
+      const today = new Date();
+      const options = {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      };
+      const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
+
+      console.log(`Ajout des fichiers pour commit ${i + 1}...`);
+      execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
+
+      console.log(`Création du commit ${i + 1}...`);
+      execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
+    }
+
+    console.log('Poussée des modifications...');
+    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
+    console.log('Modifications poussées avec succès.');
+  } catch (error) {
+    console.error(`Erreur lors de la réalisation des commits Git: ${error.message}`);
+    console.error(`Stack: ${error.stack}`);
+    process.exit(1);
+  }
 }
 
 // Détermine le nombre de commits à faire
-const commitCount = getRandomInt(1, 8); // Génère un nombre aléatoire de commits entre 1 et 8
+const commitCount = getRandomInt(1, 8);
+console.log(`Nombre de commits à réaliser: ${commitCount}`);
 
 // Ajoute les informations de commit dans le fichier HTML
 addCommitInfoToHtml(commitCount);
 
-// Enregistre le fichier HTML modifié
-fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
+try {
+  // Enregistre le fichier HTML modifié
+  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
+  console.log('Fichier HTML enregistré avec succès.');
+} catch (error) {
+  console.error(`Erreur lors de l'enregistrement du fichier HTML: ${error.message}`);
+  process.exit(1);
+}
 
 // Effectue les commits Git
 performGitCommits(commitCount);
 
 // Ferme le processus
+console.log('Processus terminé.');
 process.exit();
