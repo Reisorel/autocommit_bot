@@ -92,14 +92,24 @@ function performGitCommits(commitCount) {
       const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options).replace(/"/g, '\\"')}`;
 
       console.log(`Ajout des fichiers pour commit ${i + 1}...`);
-      execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
+      execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+
+      // Vérifier si des fichiers sont en attente de commit
+      console.log('Vérification de l\'état du dépôt avant commit...');
+      execSync('git status', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
 
       console.log(`Création du commit ${i + 1} avec le message: "${commitMessage}"`);
-      execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
+      try {
+        execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+      } catch (commitError) {
+        console.error(`Erreur lors du commit ${i + 1}: ${commitError.message}`);
+        console.error(`Stack: ${commitError.stack}`);
+        throw commitError; // Rethrow to ensure the outer catch handles it
+      }
     }
 
     console.log('Poussée des modifications...');
-    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
+    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
     console.log('Modifications poussées avec succès.');
   } catch (error) {
     console.error(`Erreur lors de la réalisation des commits Git: ${error.message}`);
@@ -107,6 +117,7 @@ function performGitCommits(commitCount) {
     process.exit(1);
   }
 }
+
 
 // Détermine le nombre de commits à faire
 const commitCount = getRandomInt(1, 8);
