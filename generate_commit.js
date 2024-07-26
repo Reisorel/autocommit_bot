@@ -116,6 +116,7 @@ function cleanCommitInfo() {
     // Construit la liste finale des commits
     commitsList.innerHTML = '';
     Object.values(commitsByDate).forEach(({ count, lastCommit }) => {
+      // Modifie le texte du dernier commit pour inclure le nombre total de commits
       const finalCommit = lastCommit.replace(/avec \d+ commits\./, `avec ${count} commits.`);
       const li = document.createElement('li');
       li.textContent = finalCommit;
