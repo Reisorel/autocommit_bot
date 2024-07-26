@@ -56,24 +56,6 @@ function addCommit(commitMessage) {
   }
 }
 
-// Fonction pour ajouter plusieurs horodatages au HTML
-function addMultipleCommitInfo(commitCount) {
-  try {
-    for (let i = 0; i < commitCount; i++) {
-      const today = new Date();
-      const options = {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-      };
-      const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
-      addCommit(commitMessage);
-    }
-  } catch (error) {
-    console.error(`Erreur lors de l'ajout des informations de commit au HTML: ${error.message}`);
-    process.exit(1);
-  }
-}
-
 // Fonction pour nettoyer les horodatages superflus dans le HTML
 function cleanCommitInfo() {
   try {
@@ -84,7 +66,9 @@ function cleanCommitInfo() {
     const commits = Array.from(commitsList.querySelectorAll('li'));
     if (commits.length > 1) {
       // Conserver uniquement le dernier élément
-      commits.slice(0, -1).forEach(commit => commitsList.removeChild(commit));
+      const lastCommit = commits.pop();
+      commitsList.innerHTML = ''; // Vide la liste
+      commitsList.appendChild(lastCommit); // Ajoute uniquement le dernier commit
     }
   } catch (error) {
     console.error(`Erreur lors du nettoyage du HTML: ${error.message}`);
@@ -133,25 +117,38 @@ function performGitCommits(commitCount) {
 const commitCount = getRandomInt(1, 8);
 console.log(`Nombre de commits à réaliser: ${commitCount}`);
 
-// Ajoute plusieurs informations de commit dans le fichier HTML
-addMultipleCommitInfo(commitCount);
+// Ajoute et commite chaque horodatage
+for (let i = 0; i < commitCount; i++) {
+  const today = new Date();
+  const options = {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+  };
+  const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
 
-try {
-  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
-  console.log('Fichier HTML enregistré avec succès.');
-} catch (error) {
-  console.error(`Erreur lors de l'enregistrement du fichier HTML: ${error.message}`);
-  process.exit(1);
+  addCommit(commitMessage);
+
+  try {
+    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
+    console.log('Fichier HTML enregistré avec succès.');
+
+    // Effectue le commit
+    performGitCommits(1); // Effectue un commit à la fois
+  } catch (error) {
+    console.error(`Erreur lors de l'enregistrement du fichier HTML ou du commit: ${error.message}`);
+    process.exit(1);
+  }
 }
 
 // Nettoie les horodatages superflus
 cleanCommitInfo();
 
 try {
-  // Effectue les commits Git
-  performGitCommits(commitCount);
+  // Enregistre le fichier HTML modifié après nettoyage
+  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
+  console.log('Fichier HTML enregistré après nettoyage avec succès.');
 } catch (error) {
-  console.error(`Erreur lors de la réalisation des commits Git: ${error.message}`);
+  console.error(`Erreur lors de l'enregistrement du fichier HTML après nettoyage: ${error.message}`);
   process.exit(1);
 }
 
