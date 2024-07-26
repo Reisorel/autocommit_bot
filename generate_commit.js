@@ -12,33 +12,30 @@ function getRandomInt(min, max) {
 }
 
 // Fonction pour ajouter une ligne avec les informations du commit
-function addCommitLine(commitCount) {
+function addCommit(commitMessage) {
   const { window } = new JSDOM(fs.readFileSync(htmlFilePath, 'utf-8'));
   const { document } = window;
 
-  // Obtient la date actuelle pour le résumé
-  const today = new Date();
-  const options = {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-  };
-  const timestamp = today.toLocaleString('fr-FR', options);
-
-  // Ajoute une nouvelle ligne <li> avec les nouvelles informations
-  const newCommit = document.createElement('li');
-  newCommit.textContent = `Commit quotidien du ${timestamp} avec ${commitCount} commits.`;
+  // Séléctionner l'élément <ul> avec l'ID 'commitsList'
   const commitsList = document.querySelector('#commitsList');
-  if (commitsList) {
-    commitsList.appendChild(newCommit);
 
-    // Ajoute un retour à la ligne après le dernier élément <li>
-    commitsList.appendChild(document.createTextNode('\n  '));
+  // Crée un nouvel élément <li> pour représenter le commit
+  const newCommit = document.createElement('li');
+  newCommit.textContent = commitMessage;
 
-    // Écrit le contenu modifié du DOM dans le fichier HTML
-    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
-  } else {
-    console.error("L'élément <ul> avec l'ID 'commitsList' n'a pas été trouvé dans le fichier HTML.");
+  // Ajoute un retour à la ligne avant le nouvel élément <li> seulement si nécessaire
+  if (commitsList.lastChild && commitsList.lastChild.nodeName === 'LI') {
+    commitsList.appendChild(document.createTextNode('\n    '));
   }
+
+  // Ajoute le nouvel élément <li> à la liste
+  commitsList.appendChild(newCommit);
+
+  // Ajoute un retour à la ligne après le dernier élément <li> seulement si nécessaire
+  commitsList.appendChild(document.createTextNode('\n  '));
+
+  // Écrit le contenu modifié du DOM dans le fichier HTML
+  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
 }
 
 // Fonction pour vérifier si des changements sont prêts à être commis
@@ -69,6 +66,8 @@ function generateCommits() {
       if (checkForChanges()) {
         console.log('Committing...');
         execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+        // Ajoute une ligne dans le fichier HTML avec le résumé du dernier commit
+        addCommit(`${commitMessage} avec ${commitCount} commits.`);
       } else {
         console.log('Aucun changement à commettre.');
       }
@@ -76,14 +75,10 @@ function generateCommits() {
       console.error('Erreur lors de l\'exécution de la commande :', err.message);
     }
   }
-  return commitCount;
 }
 
-// Génère les commits et obtient le nombre de commits réalisés
-const commitCount = generateCommits();
-
-// Ajoute une ligne dans le fichier HTML avec le résumé du dernier commit
-addCommitLine(commitCount);
+// Génère les commits
+generateCommits();
 
 // Pousse les modifications vers la branche principale sur le dépôt distant
 try {
