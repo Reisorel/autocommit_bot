@@ -66,7 +66,7 @@ function addCommit(commitMessage) {
   commitsList.appendChild(document.createTextNode('\n\n'));
 }
 
-// Fonction pour effectuer les commits Git
+// Fonction pour effectuer les commits Git sur le dépôt distant 
 function performGitCommits(commitMessage) {
   try {
     console.log('Ajout des fichiers pour le commit...');
@@ -132,7 +132,7 @@ function cleanCommitInfo() {
 }
 
 // Détermine le nombre de commits à faire pour chaque ajout (entre 1 et 8)
-const commitCount = getRandomInt(1, 2);
+const commitCount = getRandomInt(1, 8);
 console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
 // Ajoute et commite chaque horodatage
