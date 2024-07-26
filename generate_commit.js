@@ -138,7 +138,7 @@ console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 // Ajoute et commite chaque horodatage
 for (let i = 0; i < commitCount; i++) {
   const today = new Date();
-  const commitMessage = `Commit quotidien du ${formatDate(today)}`;
+  const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits`;
 
   addCommit(commitMessage);
 
