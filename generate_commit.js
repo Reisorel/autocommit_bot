@@ -1,4 +1,3 @@
-// Importe les modules nécessaires
 const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
@@ -53,19 +52,18 @@ function getRandomInt(min, max) {
 
 // Fonction pour ajouter un commit au DOM
 function addCommit(commitMessage) {
-  try {
-    const commitsList = document.querySelector('#commitsList');
-    if (!commitsList) {
-      throw new Error('Element #commitsList non trouvé dans le DOM');
-    }
-    const newCommit = document.createElement('li');
-    newCommit.textContent = commitMessage;
-    commitsList.appendChild(newCommit);
-    console.log(`Commit ajouté au DOM: ${commitMessage}`);
-  } catch (error) {
-    console.error(`Erreur lors de l'ajout du commit au DOM: ${error.message}`);
-    process.exit(1);
-  }
+  // Sélectionne l'élément avec l'ID "commitsList"
+  const commitsList = document.querySelector('#commitsList');
+
+  // Crée un nouvel élément <li> pour représenter le commit
+  const newCommit = document.createElement('li');
+  newCommit.textContent = commitMessage;
+
+  // Ajoute l'élément <li> à la liste des commits
+  commitsList.appendChild(newCommit);
+
+  // Ajoute un retour à la ligne après chaque élément <li> pour améliorer la présentation
+  commitsList.appendChild(document.createTextNode('\n\n'));
 }
 
 // Fonction pour effectuer les commits Git
@@ -122,6 +120,7 @@ function cleanCommitInfo() {
       const li = document.createElement('li');
       li.textContent = finalCommit;
       commitsList.appendChild(li);
+      commitsList.appendChild(document.createTextNode('\n\n'));
     });
 
     console.log('HTML nettoyé pour ne conserver qu\'un seul <li> par jour avec le nombre total de commits.');
