@@ -1,6 +1,6 @@
 # Bot d'Autocommit
 
-Ce projet est un **bot d'autocommit** conçu pour automatiser les commits de code dans un dépôt Git en utilisant diverses technologies telles que SSH, JSDOM, JavaScript, et crontab. Le bot est conçu pour effectuer des commits réguliers et mettre à jour un fichier HTML avec des informations de commit.
+Ce projet est un **bot d'autocommit** conçu pour automatiser les commits de code dans un dépôt Git en utilisant diverses technologies telles que SSH, JSDOM, JavaScript, et crontab. Le bot est conçu pour effectuer des commits réguliers et mettre à jour un fichier HTML avec des informations de commit (date du jour et nmombre de commits généré aléatoirement).
 
 ## Fonctionnalités
 
