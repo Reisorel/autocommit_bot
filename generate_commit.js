@@ -71,6 +71,7 @@ function performGitCommits(commitCount) {
     try {
       // Ajoute les changements et effectue le commit avec le message généré
       execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
+      console.log(`Tentative de commit: ${commitMessage}`);
       execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
       // Ajoute une pause entre les commits pour éviter des problèmes de traitement
       if (i < commitCount - 1) {
@@ -78,10 +79,18 @@ function performGitCommits(commitCount) {
       }
     } catch (error) {
       console.error('Erreur lors du commit:', error.message);
+      console.error('stdout:', error.stdout.toString());
+      console.error('stderr:', error.stderr.toString());
     }
   }
   // Pousse les modifications vers le dépôt distant
-  execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
+  try {
+    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
+  } catch (error) {
+    console.error('Erreur lors du push:', error.message);
+    console.error('stdout:', error.stdout.toString());
+    console.error('stderr:', error.stderr.toString());
+  }
 }
 
 // Détermine le nombre de commits à faire
