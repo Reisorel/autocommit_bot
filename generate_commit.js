@@ -67,9 +67,18 @@ function performGitCommits(commitCount) {
     };
     // Crée le message de commit
     const commitMessage = `Commit quotidien du ${today.toLocaleString('fr-FR', options)}`;
-    // Effectue le commit avec le message généré
-    execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
-    execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
+
+    try {
+      // Ajoute les changements et effectue le commit avec le message généré
+      execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit' });
+      execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit' });
+      // Ajoute une pause entre les commits pour éviter des problèmes de traitement
+      if (i < commitCount - 1) {
+        require('child_process').execSync('sleep 1'); // Pause de 1 seconde entre les commits
+      }
+    } catch (error) {
+      console.error('Erreur lors du commit:', error.message);
+    }
   }
   // Pousse les modifications vers le dépôt distant
   execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit' });
