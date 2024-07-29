@@ -49,6 +49,7 @@ function formatDate(date) {
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 // Fonction de génération de nombre aléatoire biaisé (66% de chance d'obtenir 2 ou 3; 33% une valeur entre 0 et 6 inclus)
 function getBiasedRandomInt() {
   const random = Math.random();
@@ -66,11 +67,12 @@ function addCommit(commitMessage) {
   commitsList.appendChild(newCommit);
   commitsList.appendChild(document.createTextNode('\n\n'));
 }
+
 // Fonction pour effectuer les commits Git sur le dépôt distant
 function performGitCommits(commitMessage) {
   try {
     console.log('Ajout des fichiers pour le commit...');
-    // Exécute la commande 'git add .' (execSync) dans le répertoire spécifié et hérite des flux du processus parent (inherit)
+    // Exécute la commande 'git add .' dans le répertoire spécifié et hérite des flux du processus parent
     execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
 
     console.log('Vérification de l\'état du dépôt avant commit...');
@@ -91,38 +93,46 @@ function performGitCommits(commitMessage) {
 
 // Fonction de nettoyage de l'archive pour ne conserver qu'un seul <li> par jour avec le nombre total de commits
 function cleanCommitInfo() {
-  // Sélectionne l'élément avec l'ID 'commitsList'
   try {
+    // Sélectionne l'élément avec l'ID 'commitsList'
     const commitsList = document.querySelector('#commitsList');
     if (!commitsList) {
       throw new Error('Element #commitsList non trouvé dans le DOM');
     }
+
     // Crée un tableau d'éléments <li> à partir de la liste des commits
     const commits = Array.from(commitsList.querySelectorAll('li'));
+
     // Initialise un objet pour stocker les commits groupés par date
     const commitsByDate = {};
+
     // Parcourt chaque élément <li> et regroupe les commits par date
     commits.forEach(commit => {
       const textContent = commit.textContent;
-      // Utilise une regex pour extraire la date du texte du commit (yeah)
+
+      // Utilise une regex pour extraire la date du texte du commit
       const dateMatch = textContent.match(/^Commit quotidien du (.+?) à/);
-      // Vérifie la correspondance
       if (dateMatch) {
         // Extrait la partie de la date de la correspondance
         const dateKey = dateMatch[1];
+
         // Si cette date n'existe pas encore dans l'objet commitsByDate, initialise-la
         if (!commitsByDate[dateKey]) {
           commitsByDate[dateKey] = { count: 0, lastCommit: textContent };
         }
+
         // Incrémente le nombre de commits pour cette date
         commitsByDate[dateKey].count++;
+
         // Met à jour le dernier commit de cette date
         commitsByDate[dateKey].lastCommit = textContent;
       }
     });
 
+    // Vide la liste des commits pour la remplir avec les commits nettoyés
     commitsList.innerHTML = '';
-     // Modifie le texte du dernier commit pour inclure le nombre total de commits
+
+    // Modifie le texte du dernier commit pour inclure le nombre total de commits
     Object.values(commitsByDate).forEach(({ count, lastCommit }) => {
       const finalCommit = lastCommit.replace(/avec \d+ commits\./, `avec ${count} commits.`);
       const li = document.createElement('li');
@@ -142,6 +152,7 @@ function cleanCommitInfo() {
 const commitCount = getBiasedRandomInt();
 console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
+// Réalise le nombre de commits déterminé
 for (let i = 0; i < commitCount; i++) {
   const today = new Date();
   const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
@@ -150,9 +161,11 @@ for (let i = 0; i < commitCount; i++) {
   addCommit(commitMessage);
 
   try {
+    // Enregistre le fichier HTML modifié
     fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
     console.log('Fichier HTML enregistré avec succès.');
 
+    // Effectue le commit avec le message spécifié
     performGitCommits(commitMessage);
   } catch (error) {
     console.error(`Erreur lors de l'enregistrement du fichier HTML ou du commit: ${error.message}`);
@@ -164,13 +177,15 @@ for (let i = 0; i < commitCount; i++) {
 cleanCommitInfo();
 
 try {
-  // Écrit le contenu HTML modifié dans le fichier 'index.html'
+  // Écrit le contenu HTML modifié après nettoyage dans le fichier 'index.html'
   fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
   console.log('Fichier HTML enregistré après nettoyage avec succès.');
 
+  // Création du message de commit pour le nettoyage
   const today = new Date();
   const commitMessage = `Nettoyage quotidien du ${formatDate(today)}`;
-  // Effectue le commit avec le message spécifié
+
+  // Effectue le commit du nettoyage en ajoutant les changements de nettoyage
   performGitCommits(commitMessage);
 } catch (error) {
   console.error(`Erreur lors de l'enregistrement du fichier HTML après nettoyage: ${error.message}`);
