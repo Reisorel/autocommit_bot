@@ -135,7 +135,7 @@ function cleanCommitInfo() {
 const commitCount = getBiasedRandomInt();
 console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
-// Réalise les commits, sauf le dernier qui sera un commit de nettoyage
+// Réalise les commits, sauf le dernier qui sera un commit de nettoyage (-1) ici
 for (let i = 0; i < commitCount - 1; i++) {
   const today = new Date();
   const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
@@ -166,7 +166,7 @@ try {
 
   // Création du message de commit pour le nettoyage
   const today = new Date();
-  const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
+  const cleanupCommitMessage = `Nettoyage quotidien du ${formatDate(today)} après ${commitCount} commits.`;
 
   // Effectue le dernier commit avec le message de nettoyage
   performGitCommits(commitMessage);
