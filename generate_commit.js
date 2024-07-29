@@ -166,7 +166,7 @@ try {
 
   // Création du message de commit pour le nettoyage
   const today = new Date();
-  const cleanupCommitMessage = `Nettoyage quotidien du ${formatDate(today)} après ${commitCount} commits.`;
+  const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
 
   // Effectue le dernier commit avec le message de nettoyage
   performGitCommits(commitMessage);
