@@ -161,6 +161,11 @@ try {
   // Enregistre le fichier HTML modifié après nettoyage
   fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
   console.log('Fichier HTML enregistré après nettoyage avec succès.');
+
+  // Effectue un commit après le nettoyage
+  const today = new Date();
+  const commitMessage = `Nettoyage quotidien du ${formatDate(today)}`;
+  performGitCommits(commitMessage);
 } catch (error) {
   console.error(`Erreur lors de l'enregistrement du fichier HTML après nettoyage: ${error.message}`);
   process.exit(1);
