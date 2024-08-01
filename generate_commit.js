@@ -13,7 +13,7 @@ try {
 }
 
 // Construit le chemin complet vers le fichier 'index.html' dans le répertoire courant
-const htmlFilePath = path.join(__dirname, 'index.html');
+const htmlFilePath = path.join(process.cwd(), 'index.html');
 
 // Lit le fichier 'index.html' de manière synchrone en utilisant l'encodage 'utf-8'
 let htmlContent;
@@ -65,7 +65,6 @@ function addCommit(commitMessage) {
   const newCommit = document.createElement('li');
   newCommit.textContent = commitMessage;
   commitsList.appendChild(newCommit);
-  commitsList.appendChild(document.createTextNode('\n\n'));
 }
 
 // Fonction pour effectuer les commits Git sur le dépôt distant
@@ -125,7 +124,6 @@ function cleanCommitInfo() {
       const li = document.createElement('li');
       li.textContent = finalCommit;
       commitsList.appendChild(li);
-      commitsList.appendChild(document.createTextNode('\n\n'));
     });
 
     console.log('HTML nettoyé pour ne conserver qu\'un seul <li> par jour avec le nombre total de commits.');
@@ -174,6 +172,9 @@ try {
 
   // Effectue le dernier commit avec le message de nettoyage
   performGitCommits(commitMessage);
+
+  // Log indiquant que l'archive du jour a été inscrite
+  console.log('L\'archive du jour a été inscrite dans le fichier HTML.');
 } catch (error) {
   console.error(`Erreur lors de l'enregistrement du fichier HTML après nettoyage: ${error.message}`);
   process.exit(1);
