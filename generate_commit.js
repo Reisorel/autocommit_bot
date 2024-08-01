@@ -179,6 +179,9 @@ try {
   fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
   console.log('Fichier HTML enregistré après nettoyage avec succès.');
 
+  // Affichage du contenu du DOM juste avant la sauvegarde finale
+  console.log('Contenu final du fichier HTML:\n', window.document.documentElement.outerHTML);
+
   // Création du message de commit pour le nettoyage
   const today = new Date();
   const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
