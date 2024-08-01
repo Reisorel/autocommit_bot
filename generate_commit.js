@@ -106,18 +106,22 @@ function cleanCommitInfo() {
       const dateMatch = textContent.match(/^Commit quotidien du (.+?) à/);
       if (dateMatch) {
         const dateKey = dateMatch[1];
+        // Initialisation correcte
         if (!commitsByDate[dateKey]) {
-          commitsByDate[dateKey] = { count: 0, lastCommit: textContent };
+          // Initialisation de l'objet pour cette date avec 1 commit déjà compté
+          commitsByDate[dateKey] = { count: 1, lastCommit: textContent };
+        } else {
+          // Incrémentation du compteur si la date est déjà présente
+          commitsByDate[dateKey].count++;
         }
-        commitsByDate[dateKey].count++;
-        commitsByDate[dateKey].lastCommit = textContent;
       }
     });
 
     commitsList.innerHTML = '';
 
     Object.values(commitsByDate).forEach(({ count, lastCommit }) => {
-      const finalCommit = lastCommit.replace(/avec \d+ commits\./, `avec ${count} commits.`);
+      // Remplacement du texte avec le nombre correct de commits
+      const finalCommit = lastCommit.replace(/avec \d+ commits?\.?/, `avec ${count} commits.`);
       const li = document.createElement('li');
       li.textContent = finalCommit;
       commitsList.appendChild(li);
