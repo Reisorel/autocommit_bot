@@ -62,11 +62,18 @@ function getBiasedRandomInt() {
 // Fonction d'ajout d'un commit au DOM
 function addCommit(commitMessage) {
   const commitsList = document.querySelector('#commitsList');
+  if (!commitsList) {
+    console.error('Erreur : Élément #commitsList non trouvé dans le DOM');
+    return;
+  }
   const newCommit = document.createElement('li');
   newCommit.textContent = commitMessage;
   commitsList.appendChild(newCommit);
   // Ajoute un retour à la ligne pour chaque élément
   commitsList.appendChild(document.createTextNode('\n'));
+
+  // Log du dernier commit ajouté
+  console.log(`Commit ajouté : ${commitMessage}`);
 }
 
 // Fonction pour effectuer les commits Git sur le dépôt distant
@@ -127,6 +134,9 @@ function cleanCommitInfo() {
       li.textContent = finalCommit;
       commitsList.appendChild(li);
       commitsList.appendChild(document.createTextNode('\n')); // Ajouter une nouvelle ligne après chaque commit
+
+      // Log du dernier commit nettoyé
+      console.log(`Commit finalisé pour la journée : ${finalCommit}`);
     });
 
     console.log('HTML nettoyé pour ne conserver qu\'un seul <li> par jour avec le nombre total de commits.');
@@ -150,15 +160,15 @@ for (let i = 0; i < commitCount - 1; i++) {
 
   try {
     // Enregistre le fichier HTML modifié
-    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
+    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
     console.log('Fichier HTML enregistré avec succès.');
-
-    // Effectue le commit avec le message spécifié
-    performGitCommits(commitMessage);
   } catch (error) {
-    console.error(`Erreur lors de l'enregistrement du fichier HTML ou du commit: ${error.message}`);
+    console.error(`Erreur lors de l'enregistrement du fichier HTML: ${error.message}`);
     process.exit(1);
   }
+
+  // Effectue le commit avec le message spécifié
+  performGitCommits(commitMessage);
 }
 
 // Appel de la fonction de nettoyage des commits avant le dernier commit
@@ -166,7 +176,7 @@ cleanCommitInfo();
 
 try {
   // Enregistre le fichier HTML modifié après nettoyage
-  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
+  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
   console.log('Fichier HTML enregistré après nettoyage avec succès.');
 
   // Création du message de commit pour le nettoyage
