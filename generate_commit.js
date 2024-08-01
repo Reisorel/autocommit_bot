@@ -65,8 +65,8 @@ function addCommit(commitMessage) {
   const newCommit = document.createElement('li');
   newCommit.textContent = commitMessage;
   commitsList.appendChild(newCommit);
-  // Ajoute un espace entre chaque entrée pour lisibilité
-  commitsList.appendChild(document.createTextNode('\n\n'));
+  // Ajoute un retour à la ligne pour chaque élément
+  commitsList.appendChild(document.createTextNode('\n'));
 }
 
 // Fonction pour effectuer les commits Git sur le dépôt distant
@@ -126,6 +126,7 @@ function cleanCommitInfo() {
       const li = document.createElement('li');
       li.textContent = finalCommit;
       commitsList.appendChild(li);
+      commitsList.appendChild(document.createTextNode('\n')); // Ajouter une nouvelle ligne après chaque commit
     });
 
     console.log('HTML nettoyé pour ne conserver qu\'un seul <li> par jour avec le nombre total de commits.');
