@@ -162,13 +162,13 @@ for (let i = 0; i < commitCount - 1; i++) {
     // Enregistre le fichier HTML modifié
     fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
     console.log('Fichier HTML enregistré avec succès.');
+
+    // Effectue le commit avec le message spécifié
+    performGitCommits(commitMessage);
   } catch (error) {
-    console.error(`Erreur lors de l'enregistrement du fichier HTML: ${error.message}`);
+    console.error(`Erreur lors de l'enregistrement du fichier HTML ou du commit: ${error.message}`);
     process.exit(1);
   }
-
-  // Effectue le commit avec le message spécifié
-  performGitCommits(commitMessage);
 }
 
 // Appel de la fonction de nettoyage des commits avant le dernier commit
