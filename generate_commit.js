@@ -13,7 +13,7 @@ try {
 }
 
 // Construit le chemin complet vers le fichier 'index.html' dans le répertoire courant
-const htmlFilePath = path.join(process.cwd(), 'index.html');
+const htmlFilePath = path.join(__dirname, 'index.html');
 
 // Lit le fichier 'index.html' de manière synchrone en utilisant l'encodage 'utf-8'
 let htmlContent;
@@ -39,8 +39,14 @@ try {
 // Fonction génération date du jour
 function formatDate(date) {
   const options = {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
   };
   return date.toLocaleString('fr-FR', options).replace(/"/g, '\\"');
 }
@@ -62,34 +68,38 @@ function getBiasedRandomInt() {
 // Fonction d'ajout d'un commit au DOM
 function addCommit(commitMessage) {
   const commitsList = document.querySelector('#commitsList');
-  if (!commitsList) {
-    console.error('Erreur : Élément #commitsList non trouvé dans le DOM');
-    return;
-  }
   const newCommit = document.createElement('li');
   newCommit.textContent = commitMessage;
   commitsList.appendChild(newCommit);
-  // Ajoute un retour à la ligne pour chaque élément
-  commitsList.appendChild(document.createTextNode('\n'));
-
-  // Log du dernier commit ajouté
-  console.log(`Commit ajouté : ${commitMessage}`);
+  commitsList.appendChild(document.createTextNode('\n\n'));
 }
 
 // Fonction pour effectuer les commits Git sur le dépôt distant
 function performGitCommits(commitMessage) {
   try {
     console.log('Ajout des fichiers pour le commit...');
-    execSync('git add .', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+    execSync('git add .', {
+      cwd: '/home/lerosier/Projet_autocommit',
+      stdio: 'inherit'
+    });
 
-    console.log('Vérification de l\'état du dépôt avant commit...');
-    execSync('git status', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+    console.log("Vérification de l'état du dépôt avant commit...");
+    execSync('git status', {
+      cwd: '/home/lerosier/Projet_autocommit',
+      stdio: 'inherit'
+    });
 
     console.log(`Création du commit avec le message: "${commitMessage}"`);
-    execSync(`git commit -m "${commitMessage}"`, { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+    execSync(`git commit -m "${commitMessage}"`, {
+      cwd: '/home/lerosier/Projet_autocommit',
+      stdio: 'inherit'
+    });
 
     console.log('Poussée des modifications...');
-    execSync('git push origin master', { cwd: '/home/lerosier/Projet_autocommit', stdio: 'inherit' });
+    execSync('git push origin master', {
+      cwd: '/home/lerosier/Projet_autocommit',
+      stdio: 'inherit'
+    });
     console.log('Modifications poussées avec succès.');
   } catch (error) {
     console.error(`Erreur lors de la réalisation du commit: ${error.message}`);
@@ -109,37 +119,35 @@ function cleanCommitInfo() {
     const commits = Array.from(commitsList.querySelectorAll('li'));
     const commitsByDate = {};
 
-    commits.forEach(commit => {
+    commits.forEach((commit) => {
       const textContent = commit.textContent;
       const dateMatch = textContent.match(/^Commit quotidien du (.+?) à/);
       if (dateMatch) {
         const dateKey = dateMatch[1];
-        // Initialisation correcte
         if (!commitsByDate[dateKey]) {
-          // Initialisation de l'objet pour cette date avec 1 commit déjà compté
-          commitsByDate[dateKey] = { count: 1, lastCommit: textContent };
-        } else {
-          // Incrémentation du compteur si la date est déjà présente
-          commitsByDate[dateKey].count++;
+          commitsByDate[dateKey] = { count: 0, lastCommit: textContent };
         }
+        commitsByDate[dateKey].count++;
+        commitsByDate[dateKey].lastCommit = textContent;
       }
     });
 
     commitsList.innerHTML = '';
 
     Object.values(commitsByDate).forEach(({ count, lastCommit }) => {
-      // Remplacement du texte avec le nombre correct de commits
-      const finalCommit = lastCommit.replace(/avec \d+ commits?\.?/, `avec ${count} commits.`);
+      const finalCommit = lastCommit.replace(
+        /avec \d+ commits\./,
+        `avec ${count} commits.`
+      );
       const li = document.createElement('li');
       li.textContent = finalCommit;
       commitsList.appendChild(li);
-      commitsList.appendChild(document.createTextNode('\n')); // Ajouter une nouvelle ligne après chaque commit
-
-      // Log du dernier commit nettoyé
-      console.log(`Commit finalisé pour la journée : ${finalCommit}`);
+      commitsList.appendChild(document.createTextNode('\n\n'));
     });
 
-    console.log('HTML nettoyé pour ne conserver qu\'un seul <li> par jour avec le nombre total de commits.');
+    console.log(
+      "HTML nettoyé pour ne conserver qu'un seul <li> par jour avec le nombre total de commits."
+    );
   } catch (error) {
     console.error(`Erreur lors du nettoyage du HTML: ${error.message}`);
     process.exit(1);
@@ -160,7 +168,7 @@ for (let i = 0; i < commitCount - 1; i++) {
 
   try {
     // Enregistre le fichier HTML modifié
-    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
+    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
     console.log('Fichier HTML enregistré avec succès.');
 
     // Effectue le commit avec le message spécifié
@@ -176,11 +184,8 @@ cleanCommitInfo();
 
 try {
   // Enregistre le fichier HTML modifié après nettoyage
-  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML, 'utf-8');
+  fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
   console.log('Fichier HTML enregistré après nettoyage avec succès.');
-
-  // Affichage du contenu du DOM juste avant la sauvegarde finale
-  console.log('Contenu final du fichier HTML:\n', window.document.documentElement.outerHTML);
 
   // Création du message de commit pour le nettoyage
   const today = new Date();
@@ -188,9 +193,6 @@ try {
 
   // Effectue le dernier commit avec le message de nettoyage
   performGitCommits(commitMessage);
-
-  // Log indiquant que l'archive du jour a été inscrite
-  console.log('L\'archive du jour a été inscrite dans le fichier HTML.');
 } catch (error) {
   console.error(`Erreur lors de l'enregistrement du fichier HTML après nettoyage: ${error.message}`);
   process.exit(1);
