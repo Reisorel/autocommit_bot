@@ -223,4 +223,3 @@ if (commitCount > 0) {
 
 console.log('Processus terminé.');
 process.exit();
-
