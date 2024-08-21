@@ -147,7 +147,7 @@ function cleanCommitInfo() {
 
       // Supprimer les sauts de ligne en trop après le dernier commit
       let nextNode = lastCommit.nextSibling;
-      while (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
+      while (nextNode && nextNode.nodeType === 3) { // Vérifie si c'est un noeud texte
         commitsList.removeChild(nextNode);
         nextNode = lastCommit.nextSibling;
       }
