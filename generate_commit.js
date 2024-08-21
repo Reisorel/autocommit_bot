@@ -145,20 +145,20 @@ function cleanCommitInfo() {
       // Supprimer les autres commits du jour pour n'en garder qu'un seul
       todayCommits.slice(0, -1).forEach((commit) => commit.remove());
 
-      // Supprimer tous les nœuds texte supplémentaires après le dernier commit du jour
+      // Supprimer les nœuds texte supplémentaires après le dernier commit du jour
       let nextNode = lastCommit.nextSibling;
-      while (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
+      while (nextNode && nextNode.nodeType === 3) { // Vérifie si c'est un nœud texte
         commitsList.removeChild(nextNode);
         nextNode = lastCommit.nextSibling;
       }
 
-      // S'assurer qu'il y a exactement un saut de ligne après le dernier commit du jour
+      // Ajouter un seul saut de ligne après le dernier commit du jour
       commitsList.appendChild(document.createTextNode('\n\n'));
 
       // Supprimer les sauts de ligne en trop entre le dernier commit du jour courant et le commit du jour précédent
       if (lastCommit.previousElementSibling) {
         let prevNode = lastCommit.previousElementSibling.nextSibling;
-        while (prevNode && prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent.trim() === '') {
+        while (prevNode && prevNode.nodeType === 3 && prevNode.textContent.trim() === '') {
           commitsList.removeChild(prevNode);
           prevNode = lastCommit.previousElementSibling.nextSibling;
         }
@@ -173,6 +173,7 @@ function cleanCommitInfo() {
     process.exit(1);
   }
 }
+
 
 // Utilise getBiasedRandomInt pour déterminer le nombre de commits
 const commitCount = getBiasedRandomInt();
