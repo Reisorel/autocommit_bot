@@ -108,7 +108,7 @@ function performGitCommits(commitMessage) {
   }
 }
 
-// Fonction de nettoyage de l'archive pour ne conserver qu'un seul <li> par jour avec le nombre total de commits
+// Fonction de nettoyage de l'archive pour regrouper tous les commits du jour actuel en un seul avec le nombre total de commits
 function cleanCommitInfo() {
   try {
     const commitsList = document.querySelector('#commitsList');
@@ -117,37 +117,35 @@ function cleanCommitInfo() {
     }
 
     const commits = Array.from(commitsList.querySelectorAll('li'));
-    const commitsByDate = {};
+    if (commits.length === 0) return;
 
-    commits.forEach((commit) => {
-      const textContent = commit.textContent;
-      const dateMatch = textContent.match(/^Commit quotidien du (.+?) à/);
-      if (dateMatch) {
-        const dateKey = dateMatch[1];
-        if (!commitsByDate[dateKey]) {
-          commitsByDate[dateKey] = { count: 0, lastCommit: textContent };
-        }
-        commitsByDate[dateKey].count++;
-        commitsByDate[dateKey].lastCommit = textContent;
-      }
+    // Récupérer la date actuelle sans l'heure pour comparer les commits du jour
+    const today = new Date();
+    const todayString = today.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
 
-    commitsList.innerHTML = '';
-
-    Object.values(commitsByDate).forEach(({ count, lastCommit }) => {
-      const finalCommit = lastCommit.replace(
-        /avec \d+ commits\./,
-        `avec ${count} commits.`
-      );
-      const li = document.createElement('li');
-      li.textContent = finalCommit;
-      commitsList.appendChild(li);
-      commitsList.appendChild(document.createTextNode('\n\n'));
-    });
-
-    console.log(
-      "HTML nettoyé pour ne conserver qu'un seul <li> par jour avec le nombre total de commits."
+    // Filtrer tous les commits du jour courant
+    const todayCommits = commits.filter((commit) =>
+      commit.textContent.includes(`Commit quotidien du ${todayString}`)
     );
+
+    if (todayCommits.length > 0) {
+      // Compter le nombre de commits réalisés ce jour
+      const commitCount = todayCommits.length;
+
+      // Conserver le dernier commit et mettre à jour son message avec le nombre total de commits
+      const lastCommit = todayCommits[todayCommits.length - 1];
+      lastCommit.textContent = `Commit quotidien du ${todayString} à ${today.toLocaleTimeString('fr-FR')} avec ${commitCount} commits.`;
+
+      // Supprimer les autres commits du jour pour n'en garder qu'un seul
+      todayCommits.slice(0, -1).forEach((commit) => commit.remove());
+    }
+
+    console.log("HTML nettoyé pour regrouper tous les commits du jour courant.");
   } catch (error) {
     console.error(`Erreur lors du nettoyage du HTML: ${error.message}`);
     process.exit(1);
