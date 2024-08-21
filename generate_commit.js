@@ -145,7 +145,14 @@ function cleanCommitInfo() {
       // Supprimer les autres commits du jour pour n'en garder qu'un seul
       todayCommits.slice(0, -1).forEach((commit) => commit.remove());
 
-      // S'assurer qu'il y a une ligne vide après le dernier commit
+      // Supprimer les sauts de ligne en trop après le dernier commit
+      let nextNode = lastCommit.nextSibling;
+      while (nextNode && nextNode.nodeType === 3) { // Vérifie si c'est un noeud texte
+        commitsList.removeChild(nextNode);
+        nextNode = lastCommit.nextSibling;
+      }
+
+      // S'assurer qu'il y a un seul saut de ligne après le dernier commit
       commitsList.appendChild(document.createTextNode('\n'));
     }
 
