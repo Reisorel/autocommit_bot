@@ -145,25 +145,25 @@ function cleanCommitInfo() {
       // Supprimer les autres commits du jour pour n'en garder qu'un seul
       todayCommits.slice(0, -1).forEach((commit) => commit.remove());
 
-      // Supprimer tous les sauts de ligne supplémentaires après le dernier commit du jour
+      // Supprimer tous les nœuds texte supplémentaires après le dernier commit du jour
       let nextNode = lastCommit.nextSibling;
-      while (nextNode && nextNode.nodeType === 3) { // Vérifie si c'est un nœud texte (espace ou saut de ligne)
+      while (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
         commitsList.removeChild(nextNode);
         nextNode = lastCommit.nextSibling;
       }
 
-      // Ajouter un seul saut de ligne après le dernier commit du jour
-      commitsList.appendChild(document.createTextNode('\n'));
+      // S'assurer qu'il y a exactement un saut de ligne après le dernier commit du jour
+      commitsList.appendChild(document.createTextNode('\n\n'));
 
       // Supprimer les sauts de ligne en trop entre le dernier commit du jour courant et le commit du jour précédent
       if (lastCommit.previousElementSibling) {
         let prevNode = lastCommit.previousElementSibling.nextSibling;
-        while (prevNode && prevNode.nodeType === 3 && prevNode.textContent.trim() === '') {
+        while (prevNode && prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent.trim() === '') {
           commitsList.removeChild(prevNode);
           prevNode = lastCommit.previousElementSibling.nextSibling;
         }
-        // Ajouter un seul saut de ligne entre les deux jours
-        commitsList.insertBefore(document.createTextNode('\n'), lastCommit);
+        // Ajouter exactement un saut de ligne entre les jours
+        commitsList.insertBefore(document.createTextNode('\n\n'), lastCommit);
       }
     }
 
