@@ -71,6 +71,7 @@ function addCommit(commitMessage) {
   const newCommit = document.createElement('li');
   newCommit.textContent = commitMessage;
   commitsList.appendChild(newCommit);
+  // Assurer une ligne vide après chaque entrée
   commitsList.appendChild(document.createTextNode('\n\n'));
 }
 
@@ -143,9 +144,12 @@ function cleanCommitInfo() {
 
       // Supprimer les autres commits du jour pour n'en garder qu'un seul
       todayCommits.slice(0, -1).forEach((commit) => commit.remove());
+
+      // S'assurer qu'il y a une ligne vide après le dernier commit
+      commitsList.appendChild(document.createTextNode('\n'));
     }
 
-    console.log("HTML nettoyé pour regrouper tous les commits du jour courant.");
+    console.log("HTML nettoyé pour regrouper tous les commits du jour courant avec la mise en forme correcte.");
   } catch (error) {
     console.error(`Erreur lors du nettoyage du HTML: ${error.message}`);
     process.exit(1);
