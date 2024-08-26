@@ -157,16 +157,12 @@ const commitCount = getBiasedRandomInt();
 console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
 if (commitCount > 0) {
+  // Effectuer le nettoyage avant d'ajouter les commits du jour
+  cleanCommitInfo();
+
   for (let i = 0; i < commitCount; i++) {
     const today = new Date();
-    let commitMessage;
-
-    if (i === commitCount - 1) {
-      cleanCommitInfo(); // Nettoyage effectué juste avant le dernier commit
-      commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
-    } else {
-      commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
-    }
+    let commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
 
     addCommit(commitMessage);
 
@@ -193,3 +189,4 @@ if (commitCount > 0) {
 
 console.log('Processus terminé.');
 process.exit();
+
