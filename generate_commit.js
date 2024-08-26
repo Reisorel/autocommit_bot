@@ -174,16 +174,22 @@ function cleanCommitInfo() {
   }
 }
 
-
 // Utilise getBiasedRandomInt pour déterminer le nombre de commits
 const commitCount = getBiasedRandomInt();
 console.log(`Nombre de commits à réaliser pour chaque ajout: ${commitCount}`);
 
 if (commitCount > 0) {
-  // Réalise les commits, sauf le dernier qui sera un commit de nettoyage (-1) ici
-  for (let i = 0; i < commitCount - 1; i++) {
+  for (let i = 0; i < commitCount; i++) {
     const today = new Date();
-    const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
+    let commitMessage;
+
+    // Si c'est le dernier commit, on inclut le nettoyage
+    if (i === commitCount - 1) {
+      cleanCommitInfo();
+      commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
+    } else {
+      commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
+    }
 
     // Ajoute le commit au DOM
     addCommit(commitMessage);
@@ -199,25 +205,6 @@ if (commitCount > 0) {
       console.error(`Erreur lors de l'enregistrement du fichier HTML ou du commit: ${error.message}`);
       process.exit(1);
     }
-  }
-
-  // Appel de la fonction de nettoyage des commits avant le dernier commit
-  cleanCommitInfo();
-
-  try {
-    // Enregistre le fichier HTML modifié après nettoyage
-    fs.writeFileSync(htmlFilePath, window.document.documentElement.outerHTML);
-    console.log('Fichier HTML enregistré après nettoyage avec succès.');
-
-    // Création du message de commit pour le nettoyage
-    const today = new Date();
-    const commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
-
-    // Effectue le dernier commit avec le message de nettoyage
-    performGitCommits(commitMessage);
-  } catch (error) {
-    console.error(`Erreur lors de l'enregistrement du fichier HTML après nettoyage: ${error.message}`);
-    process.exit(1);
   }
 } else {
   // Si le nombre de commits est 0, on enregistre le fichier sans faire de commit
