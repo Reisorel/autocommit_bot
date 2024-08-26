@@ -162,7 +162,7 @@ if (commitCount > 0) {
     let commitMessage;
 
     if (i === commitCount - 1) {
-      cleanCommitInfo();
+      cleanCommitInfo(); // Nettoyage effectué juste avant le dernier commit
       commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
     } else {
       commitMessage = `Commit quotidien du ${formatDate(today)} avec ${commitCount} commits.`;
